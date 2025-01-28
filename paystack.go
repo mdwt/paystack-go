@@ -1,6 +1,8 @@
 package paystack
 
-import "github.com/go-resty/resty/v2"
+import (
+	"github.com/go-resty/resty/v2"
+)
 
 const (
 	BaseURLV1 = "https://api.paystack.co"

@@ -1,9 +1,11 @@
 package paystack
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/go-resty/resty/v2"
+	"log/slog"
 )
 
 type TransactionService struct {
@@ -35,9 +37,10 @@ type InitialiseResponse struct {
 
 // Initialize initiates a transaction process
 // For more details see https://paystack.com/docs/api/transaction/#initialize
-func (s *TransactionService) Initialize(txn *TransactionRequest) (InitialiseResponse, error) {
+func (s *TransactionService) Initialize(ctx context.Context, txn *TransactionRequest) (InitialiseResponse, error) {
 	path := fmt.Sprintf("/transaction/initialize")
 	resp, err := s.client.R().
+		SetContext(ctx).
 		SetBody(txn).
 		Post(path)
 
@@ -49,6 +52,7 @@ func (s *TransactionService) Initialize(txn *TransactionRequest) (InitialiseResp
 		return InitialiseResponse{}, newAPIError(resp)
 	}
 
+	slog.Info("response", "rsp", resp.String())
 	var result ApiResponse[InitialiseResponse]
 	err = json.Unmarshal(resp.Body(), &result)
 	if err != nil {
