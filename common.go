@@ -17,3 +17,9 @@ type ListMeta struct {
 
 // Metadata is an key-value pairs added to Paystack API requests
 type Metadata map[string]interface{}
+
+type MetadataCustomField struct {
+	DisplayName  string `json:"display_name"`
+	VariableName string `json:"variable_name"`
+	Value        string `json:"value"`
+}
