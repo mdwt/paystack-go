@@ -16,8 +16,8 @@ type APIError struct {
 }
 
 // APIError supports the error interface
-func (aerr *APIError) Error() string {
-	ret, _ := json.Marshal(aerr)
+func (e APIError) Error() string {
+	ret, _ := json.Marshal(e)
 	return string(ret)
 }
 
