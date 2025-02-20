@@ -51,6 +51,10 @@ type InitialiseResponse struct {
 	Reference        string `json:"reference"`
 }
 
+type MetadataUnmarshaler interface {
+	UnmarshalMetadata()
+}
+
 type ChargeAuthorizationResponse struct {
 	Amount          int         `json:"amount"`
 	Currency        string      `json:"currency"`
@@ -58,7 +62,7 @@ type ChargeAuthorizationResponse struct {
 	Status          string      `json:"status"`
 	Reference       string      `json:"reference"`
 	Domain          string      `json:"domain"`
-	Metadata        string      `json:"metadata"`
+	Metadata        interface{} `json:"metadata"`
 	GatewayResponse string      `json:"gateway_response"`
 	Message         interface{} `json:"message"`
 	Channel         string      `json:"channel"`
