@@ -1,8 +1,9 @@
-package paystack
+package transactions
 
 import (
 	"context"
 	"fmt"
+	"github.com/mdwt/paystack-go"
 	"math/rand"
 	"testing"
 )
@@ -14,8 +15,8 @@ func TestInitializeTransaction(t *testing.T) {
 		Reference: fmt.Sprintf("ref_%d", rand.Intn(1000000)),
 	}
 
-	transaction := TransactionService{
-		client: getClient("sk_test_e39ce23869e6e677121a5e6ef691a8c3d835f0bb"),
+	transaction := Client{
+		client: paystack.getClient("sk_test_e39ce23869e6e677121a5e6ef691a8c3d835f0bb"),
 	}
 
 	_, err := transaction.Initialize(context.Background(), txn)
@@ -34,8 +35,8 @@ func TestChargeAuthorization(t *testing.T) {
 		Reference:         fmt.Sprintf("ref_%d", rand.Intn(1000000)),
 	}
 
-	transaction := TransactionService{
-		client: getClient("sk_test_e39ce23869e6e677121a5e6ef691a8c3d835f0bb"),
+	transaction := Client{
+		client: paystack.getClient("sk_test_e39ce23869e6e677121a5e6ef691a8c3d835f0bb"),
 	}
 
 	_, err := transaction.ChargeAuthorization(context.Background(), txn)

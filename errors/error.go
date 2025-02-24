@@ -1,4 +1,4 @@
-package paystack
+package errors
 
 import (
 	"encoding/json"
@@ -28,7 +28,7 @@ type ErrorResponse struct {
 	Errors  map[string]interface{} `json:"errors,omitempty"`
 }
 
-func newAPIError(resp *resty.Response) *APIError {
+func NewAPIError(resp *resty.Response) *APIError {
 	var details ErrorResponse
 	_ = json.Unmarshal(resp.Body(), &details)
 

@@ -1,47 +1,31 @@
 package paystack
 
 import (
-	"github.com/go-resty/resty/v2"
+	"github.com/mdwt/paystack-go/client"
+	"github.com/mdwt/paystack-go/transactions"
 )
 
 const (
 	BaseURLV1 = "https://api.paystack.co"
 )
 
-type errorResponse struct {
-	Status  bool   `json:"status"`
-	Message string `json:"message"`
+type Options struct {
+	ApiKey    string
+	ConnectId string
 }
 
-type PaystackResponse struct {
-	Status  int         `json:"status"`
-	Message int         `json:"message"`
-	Data    interface{} `json:"data"`
+type PaystackApi struct {
+	Transaction *transactions.Client
 }
 
-type Client struct {
-	BaseURL string
-	apiKey  string
-	client  *resty.Client
+func NewPaystackApi(options Options) *PaystackApi {
+	apiClient := client.NewApiClient(client.Options{
+		ApiKey:    options.ApiKey,
+		ConnectId: options.ConnectId,
+		BaseUrl:   BaseURLV1,
+	})
 
-	Transaction *TransactionService
-}
-
-func NewClient(apiKey string) *Client {
-	client := getClient(apiKey)
-
-	return &Client{
-		client: client,
-		Transaction: &TransactionService{
-			client: client,
-		},
+	return &PaystackApi{
+		Transaction: transactions.NewClient(apiClient),
 	}
-}
-
-func getClient(apiKey string) *resty.Client {
-	client := resty.New()
-	client.SetAuthToken(apiKey).
-		SetHeader("Content-Type", "application/json").
-		SetBaseURL(BaseURLV1)
-	return client
 }

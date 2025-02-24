@@ -1,4 +1,4 @@
-package paystack
+package common
 
 type ApiResponse[T any] struct {
 	Status  bool   `json:"status"`
@@ -22,4 +22,15 @@ type MetadataCustomField struct {
 	DisplayName  string `json:"display_name"`
 	VariableName string `json:"variable_name"`
 	Value        string `json:"value"`
+}
+
+type errorResponse struct {
+	Status  bool   `json:"status"`
+	Message string `json:"message"`
+}
+
+type PaystackResponse struct {
+	Status  int         `json:"status"`
+	Message int         `json:"message"`
+	Data    interface{} `json:"data"`
 }
