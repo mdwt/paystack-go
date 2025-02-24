@@ -1,5 +1,9 @@
 package common
 
+const (
+	BaseURLV1 = "https://api.paystack.co"
+)
+
 type ApiResponse[T any] struct {
 	Status  bool   `json:"status"`
 	Message string `json:"message"`

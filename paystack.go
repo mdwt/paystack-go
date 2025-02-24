@@ -5,10 +5,6 @@ import (
 	"github.com/mdwt/paystack-go/transactions"
 )
 
-const (
-	BaseURLV1 = "https://api.paystack.co"
-)
-
 type Options struct {
 	ApiKey    string
 	ConnectId string

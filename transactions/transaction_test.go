@@ -3,7 +3,8 @@ package transactions
 import (
 	"context"
 	"fmt"
-	"github.com/mdwt/paystack-go"
+	"github.com/mdwt/paystack-go/client"
+	"github.com/mdwt/paystack-go/common"
 	"math/rand"
 	"testing"
 )
@@ -14,10 +15,12 @@ func TestInitializeTransaction(t *testing.T) {
 		Amount:    6000,
 		Reference: fmt.Sprintf("ref_%d", rand.Intn(1000000)),
 	}
-
-	transaction := Client{
-		client: paystack.getClient("sk_test_e39ce23869e6e677121a5e6ef691a8c3d835f0bb"),
-	}
+	apiClient := client.NewApiClient(client.Options{
+		ApiKey:    "sk_test_e39ce23869e6e677121a5e6ef691a8c3d835f0bb",
+		ConnectId: "",
+		BaseUrl:   common.BaseURLV1,
+	})
+	transaction := NewClient(apiClient)
 
 	_, err := transaction.Initialize(context.Background(), txn)
 	if err != nil {
@@ -35,9 +38,12 @@ func TestChargeAuthorization(t *testing.T) {
 		Reference:         fmt.Sprintf("ref_%d", rand.Intn(1000000)),
 	}
 
-	transaction := Client{
-		client: paystack.getClient("sk_test_e39ce23869e6e677121a5e6ef691a8c3d835f0bb"),
-	}
+	apiClient := client.NewApiClient(client.Options{
+		ApiKey:    "sk_test_e39ce23869e6e677121a5e6ef691a8c3d835f0bb",
+		ConnectId: "",
+		BaseUrl:   common.BaseURLV1,
+	})
+	transaction := NewClient(apiClient)
 
 	_, err := transaction.ChargeAuthorization(context.Background(), txn)
 	if err != nil {
