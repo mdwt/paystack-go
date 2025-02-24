@@ -7,17 +7,19 @@ import (
 	"github.com/mdwt/paystack-go/client"
 	"github.com/mdwt/paystack-go/common"
 	"github.com/mdwt/paystack-go/errors"
-	"log/slog"
+	"github.com/mdwt/paystack-go/logger"
 )
 
 type Client struct {
 	client *client.ApiClient
+	logger logger.Logger
 }
 
 // NewClient creates a new instance of the transactions client
-func NewClient(apiClient *client.ApiClient) *Client {
+func NewClient(apiClient *client.ApiClient, logger logger.Logger) *Client {
 	return &Client{
 		client: apiClient,
+		logger: logger,
 	}
 }
 
@@ -31,7 +33,7 @@ func (s *Client) Initialize(ctx context.Context, txn *TransactionRequest) (Initi
 		return InitialiseResponse{}, err
 	}
 
-	slog.Debug("request", "request", jsonData)
+	s.logger.Debug("request", "request", jsonData)
 	resp, err := s.client.R().
 		SetContext(ctx).
 		SetBody(jsonData).
@@ -45,7 +47,7 @@ func (s *Client) Initialize(ctx context.Context, txn *TransactionRequest) (Initi
 		return InitialiseResponse{}, errors.NewAPIError(resp)
 	}
 
-	slog.Info("response", "rsp", resp.String())
+	s.logger.Info("response", "rsp", resp.String())
 	var result common.ApiResponse[InitialiseResponse]
 	err = json.Unmarshal(resp.Body(), &result)
 	if err != nil {
@@ -55,7 +57,7 @@ func (s *Client) Initialize(ctx context.Context, txn *TransactionRequest) (Initi
 	return result.Data, err
 }
 
-// Initialize initiates a transaction process
+// ChargeAuthorization initiates a transaction process
 // For more details see https://paystack.com/docs/api/transaction/#initialize
 func (s *Client) ChargeAuthorization(ctx context.Context, txn ChargeAuthorizationRequest) (ChargeAuthorizationResponse, error) {
 	path := fmt.Sprintf("/transaction/charge_authorization")
@@ -69,10 +71,11 @@ func (s *Client) ChargeAuthorization(ctx context.Context, txn ChargeAuthorizatio
 	}
 
 	if resp.IsError() {
+		s.logger.Errorf("Error response from Paystack API: %s", resp.String())
 		return ChargeAuthorizationResponse{}, errors.NewAPIError(resp)
 	}
 
-	slog.Info("response", "rsp", resp.String())
+	s.logger.Debug("response", "rsp", resp.String())
 	var result common.ApiResponse[ChargeAuthorizationResponse]
 	err = json.Unmarshal(resp.Body(), &result)
 	if err != nil {
