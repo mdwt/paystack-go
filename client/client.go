@@ -1,9 +1,12 @@
 package client
 
-import "github.com/go-resty/resty/v2"
+import (
+	"net/http"
+)
 
 type ApiClient struct {
-	*resty.Client
+	http.Client
+	Options
 }
 
 type Options struct {
@@ -13,16 +16,18 @@ type Options struct {
 }
 
 func NewApiClient(options Options) *ApiClient {
-	client := resty.New()
-	client.SetAuthToken(options.ApiKey).
-		SetBaseURL(options.BaseUrl).
-		SetHeader("Content-Type", "application/json")
-
-	if options.ConnectId != "" {
-		client.SetHeader("X-Connect-Account", options.ConnectId)
-	}
-
+	client := http.Client{}
 	return &ApiClient{
-		Client: client,
+		Client:  client,
+		Options: options,
 	}
+}
+
+func (c *ApiClient) Do(req *http.Request) (*http.Response, error) {
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+c.Options.ApiKey)
+	if c.Options.ConnectId != "" {
+		req.Header.Set("X-Connect-Account", c.Options.ConnectId)
+	}
+	return c.Client.Do(req)
 }

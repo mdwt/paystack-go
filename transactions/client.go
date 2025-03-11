@@ -1,6 +1,7 @@
 package transactions
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"github.com/mdwt/paystack-go/common"
 	"github.com/mdwt/paystack-go/errors"
 	"github.com/mdwt/paystack-go/logger"
+	"net/http"
 )
 
 type Client struct {
@@ -26,30 +28,35 @@ func NewClient(apiClient *client.ApiClient, logger logger.Logger) *Client {
 // Initialize initiates a transaction process
 // For more details see https://paystack.com/docs/api/transaction/#initialize
 func (s *Client) Initialize(ctx context.Context, txn *TransactionRequest) (InitialiseResponse, error) {
-	path := fmt.Sprintf("/transaction/initialize")
+	path := fmt.Sprintf("%s/transaction/initialize", s.client.Options.BaseUrl)
 
 	jsonData, err := json.Marshal(txn)
 	if err != nil {
 		return InitialiseResponse{}, err
 	}
-
 	s.logger.Debug("request", "request", jsonData)
-	resp, err := s.client.R().
-		SetContext(ctx).
-		SetBody(jsonData).
-		Post(path)
 
+	req, err := http.NewRequestWithContext(ctx, "POST", path, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return InitialiseResponse{}, err
+	}
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return InitialiseResponse{}, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		return InitialiseResponse{}, errors.NewAPIError(resp)
+	}
+
+	var result common.ApiResponse[InitialiseResponse]
+	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
 		return InitialiseResponse{}, err
 	}
 
-	if resp.IsError() {
-		return InitialiseResponse{}, errors.NewAPIError(resp)
-	}
-
-	s.logger.Info("response", "rsp", resp.String())
-	var result common.ApiResponse[InitialiseResponse]
-	err = json.Unmarshal(resp.Body(), &result)
+	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
 		return InitialiseResponse{}, err
 	}
@@ -60,24 +67,28 @@ func (s *Client) Initialize(ctx context.Context, txn *TransactionRequest) (Initi
 // ChargeAuthorization initiates a transaction process
 // For more details see https://paystack.com/docs/api/transaction/#initialize
 func (s *Client) ChargeAuthorization(ctx context.Context, txn ChargeAuthorizationRequest) (ChargeAuthorizationResponse, error) {
-	path := fmt.Sprintf("/transaction/charge_authorization")
-	resp, err := s.client.R().
-		SetContext(ctx).
-		SetBody(txn).
-		Post(path)
-
+	path := fmt.Sprintf("%s/transaction/charge_authorization", s.client.Options.BaseUrl)
+	jsonData, err := json.Marshal(txn)
 	if err != nil {
 		return ChargeAuthorizationResponse{}, err
 	}
+	s.logger.Debug("request", "request", jsonData)
+	req, err := http.NewRequestWithContext(ctx, "POST", path, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return ChargeAuthorizationResponse{}, err
+	}
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return ChargeAuthorizationResponse{}, err
+	}
+	defer resp.Body.Close()
 
-	if resp.IsError() {
-		s.logger.Errorf("Error response from Paystack API: %s", resp.String())
+	if resp.StatusCode >= 400 {
 		return ChargeAuthorizationResponse{}, errors.NewAPIError(resp)
 	}
 
-	s.logger.Debug("response", "rsp", resp.String())
 	var result common.ApiResponse[ChargeAuthorizationResponse]
-	err = json.Unmarshal(resp.Body(), &result)
+	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
 		return ChargeAuthorizationResponse{}, err
 	}

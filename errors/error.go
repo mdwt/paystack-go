@@ -2,7 +2,6 @@ package errors
 
 import (
 	"encoding/json"
-	"github.com/go-resty/resty/v2"
 	"net/http"
 )
 
@@ -28,14 +27,20 @@ type ErrorResponse struct {
 	Errors  map[string]interface{} `json:"errors,omitempty"`
 }
 
-func NewAPIError(resp *resty.Response) *APIError {
+func NewAPIError(resp *http.Response) *APIError {
 	var details ErrorResponse
-	_ = json.Unmarshal(resp.Body(), &details)
+	err := json.NewDecoder(resp.Body).Decode(&details)
+	if err != nil {
+		details = ErrorResponse{
+			Status:  false,
+			Message: "Failed to decode error response",
+		}
+	}
 
 	return &APIError{
-		HTTPStatusCode: resp.StatusCode(),
-		Header:         resp.Header(),
+		HTTPStatusCode: resp.StatusCode,
+		Header:         resp.Header,
 		Details:        details,
-		URL:            resp.Request.URL,
+		URL:            resp.Request.URL.String(),
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mdwt/paystack-go/client"
 	"github.com/mdwt/paystack-go/common"
+	"github.com/mdwt/paystack-go/logger"
 	"math/rand"
 	"testing"
 )
@@ -20,7 +21,7 @@ func TestInitializeTransaction(t *testing.T) {
 		ConnectId: "",
 		BaseUrl:   common.BaseURLV1,
 	})
-	transaction := NewClient(apiClient)
+	transaction := NewClient(apiClient, logger.NewDefaultLogger())
 
 	_, err := transaction.Initialize(context.Background(), txn)
 	if err != nil {
@@ -36,6 +37,7 @@ func TestChargeAuthorization(t *testing.T) {
 		AuthorizationCode: "AUTH_468hvddfw6",
 		Currency:          "ZAR",
 		Reference:         fmt.Sprintf("ref_%d", rand.Intn(1000000)),
+		Queue:             true,
 	}
 
 	apiClient := client.NewApiClient(client.Options{
@@ -43,7 +45,7 @@ func TestChargeAuthorization(t *testing.T) {
 		ConnectId: "",
 		BaseUrl:   common.BaseURLV1,
 	})
-	transaction := NewClient(apiClient)
+	transaction := NewClient(apiClient, logger.NewDefaultLogger())
 
 	_, err := transaction.ChargeAuthorization(context.Background(), txn)
 	if err != nil {
