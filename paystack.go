@@ -4,6 +4,7 @@ import (
 	"github.com/mdwt/paystack-go/client"
 	"github.com/mdwt/paystack-go/common"
 	"github.com/mdwt/paystack-go/logger"
+	"github.com/mdwt/paystack-go/refunds"
 	"github.com/mdwt/paystack-go/transactions"
 )
 
@@ -15,6 +16,7 @@ type Options struct {
 
 type PaystackApi struct {
 	Transaction *transactions.Client
+	Refund      *refunds.Client
 }
 
 func NewPaystackApi(options Options) *PaystackApi {
@@ -33,5 +35,6 @@ func NewPaystackApi(options Options) *PaystackApi {
 
 	return &PaystackApi{
 		Transaction: transactions.NewClient(apiClient, log),
+		Refund:      refunds.NewClient(apiClient, log),
 	}
 }
