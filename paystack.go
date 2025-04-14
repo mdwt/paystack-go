@@ -20,11 +20,11 @@ type PaystackApi struct {
 }
 
 func NewPaystackApi(options Options) *PaystackApi {
-	apiClient := client.NewApiClient(client.Options{
+	clientOpts := client.Options{
 		ApiKey:    options.ApiKey,
 		ConnectId: options.ConnectId,
 		BaseUrl:   common.BaseURLV1,
-	})
+	}
 
 	var log logger.Logger
 	if options.Logger != nil {
@@ -34,7 +34,7 @@ func NewPaystackApi(options Options) *PaystackApi {
 	}
 
 	return &PaystackApi{
-		Transaction: transactions.NewClient(apiClient, log),
-		Refund:      refunds.NewClient(apiClient, log),
+		Transaction: transactions.New(clientOpts, log),
+		Refund:      refunds.New(clientOpts, log),
 	}
 }

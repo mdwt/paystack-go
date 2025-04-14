@@ -16,12 +16,12 @@ func TestInitializeTransaction(t *testing.T) {
 		Amount:    6000,
 		Reference: fmt.Sprintf("ref_%d", rand.Intn(1000000)),
 	}
-	apiClient := client.NewApiClient(client.Options{
+
+	transaction := New(client.Options{
 		ApiKey:    "sk_test_e39ce23869e6e677121a5e6ef691a8c3d835f0bb",
 		ConnectId: "",
 		BaseUrl:   common.BaseURLV1,
-	})
-	transaction := NewClient(apiClient, logger.NewDefaultLogger())
+	}, logger.NewDefaultLogger())
 
 	_, err := transaction.Initialize(context.Background(), txn)
 	if err != nil {
@@ -40,12 +40,11 @@ func TestChargeAuthorization(t *testing.T) {
 		Queue:             true,
 	}
 
-	apiClient := client.NewApiClient(client.Options{
+	transaction := New(client.Options{
 		ApiKey:    "sk_test_e39ce23869e6e677121a5e6ef691a8c3d835f0bb",
 		ConnectId: "",
 		BaseUrl:   common.BaseURLV1,
-	})
-	transaction := NewClient(apiClient, logger.NewDefaultLogger())
+	}, logger.NewDefaultLogger())
 
 	_, err := transaction.ChargeAuthorization(context.Background(), txn)
 	if err != nil {
