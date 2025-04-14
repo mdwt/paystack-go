@@ -50,7 +50,33 @@ func Post[T any](ctx context.Context, options Options, path string, body []byte)
 	if err != nil {
 		return zero, err
 	}
-	
+
+	return result.Data, err
+}
+
+func Get[T any](ctx context.Context, options Options, path string) (T, error) {
+	var zero T
+	req, err := http.NewRequestWithContext(ctx, "GET", options.BaseUrl+path, nil)
+	if err != nil {
+		return zero, err
+	}
+	c := NewApiClient(options)
+
+	resp, err := c.Do(req)
+	if err != nil {
+		return zero, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		return zero, errors.NewAPIError(resp)
+	}
+	var result common.ApiResponse[T]
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		return zero, err
+	}
+
 	return result.Data, err
 }
 

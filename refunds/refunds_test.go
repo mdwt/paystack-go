@@ -25,3 +25,20 @@ func TestInitializeTransaction(t *testing.T) {
 	}
 
 }
+
+func TestFetchRefund(t *testing.T) {
+	ctx := context.Background()
+	refunds := New(client.Options{
+		ApiKey:    "sk_test_e39ce23869e6e677121a5e6ef691a8c3d835f0bb",
+		ConnectId: "",
+		BaseUrl:   common.BaseURLV1,
+	}, logger.NewDefaultLogger())
+
+	refundID := "14358737"
+	_, err := refunds.Fetch(ctx, refundID)
+	if err != nil {
+		t.Errorf("Failed to fetch refund: %v", err)
+		return
+	}
+
+}

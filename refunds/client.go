@@ -35,3 +35,13 @@ func (s *Client) Create(ctx context.Context, request *CreateRefundRequest) (Crea
 
 	return resp, err
 }
+
+// Fetch retrieves a refund by its ID.
+func (s *Client) Fetch(ctx context.Context, id string) (Refund, error) {
+	resp, err := client.Get[Refund](ctx, s.options, "/refund/"+id)
+	if err != nil {
+		return Refund{}, err
+	}
+
+	return resp, err
+}
